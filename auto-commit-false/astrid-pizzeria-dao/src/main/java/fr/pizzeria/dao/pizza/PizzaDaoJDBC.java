@@ -150,12 +150,18 @@ public class PizzaDaoJDBC implements PizzaDao {
 					addPizzaSt.setString(2, pizza.getNom());
 					addPizzaSt.setDouble(3, pizza.getPrix());
 					addPizzaSt.setString(4, pizza.getCatP());
-					addPizzaSt.executeUpdate();
-				}
-			}
+					//addPizzaSt.executeUpdate();
+					if (!addPizzaSt.execute()) {
+						connection.rollback();
+					}
 
-			connection.rollback();
-			connection.commit();
+				}
+				connection.commit();
+				}
+			
+
+			//connection.rollback();
+			//connection.commit();
 			return Void.TYPE;
 		});
 
