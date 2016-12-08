@@ -141,33 +141,21 @@ public class PizzaDaoJDBC implements PizzaDao {
 		executePrep((Connection connection) -> {
 			connection.setAutoCommit(false);
 			List<List<Pizza>> list = partition(listPizzas, 3);
-			list.forEach(f -> {
 
-				f.forEach(d -> {
-					try {
-						Pizza pizza = d;
-						PreparedStatement addPizzaSt = connection
-								.prepareStatement("INSERT INTO PIZZA (CODE, NOM, PRIX, CATEGORIE) VALUES (?,?,?,?)");
-						addPizzaSt.setString(1, pizza.getCode());
-						addPizzaSt.setString(2, pizza.getNom());
-						addPizzaSt.setDouble(3, pizza.getPrix());
-						addPizzaSt.setString(4, pizza.getCatP());
-						addPizzaSt.executeUpdate();
-					} catch (SQLException e) {
-						try {
-							connection.rollback();
-						} catch (SQLException e1) {
-							e1.printStackTrace();
-						}
-						e.printStackTrace();
-					}
-				});
-				try {
-					connection.commit();
-				} catch (SQLException e) {
-					e.printStackTrace();
+			for (List<Pizza> liste : list) {
+				for (Pizza pizza : liste) {
+					PreparedStatement addPizzaSt = connection
+							.prepareStatement("INSERT INTO PIZZA (CODE, NOM, PRIX, CATEGORIE) VALUES (?,?,?,?)");
+					addPizzaSt.setString(1, pizza.getCode());
+					addPizzaSt.setString(2, pizza.getNom());
+					addPizzaSt.setDouble(3, pizza.getPrix());
+					addPizzaSt.setString(4, pizza.getCatP());
+					addPizzaSt.executeUpdate();
 				}
-			});
+			}
+
+			connection.rollback();
+			connection.commit();
 			return Void.TYPE;
 		});
 
